@@ -1,0 +1,46 @@
+﻿@page "/"
+
+<PageTitle>Sample Page</PageTitle>
+
+<p>Fetch Data Duration: @_elapsed ms</p>
+
+@if (_parents == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Parent Value</th>
+            <th>Children Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var parent in _parents)
+        {
+            <tr>
+                <td>@parent.Id</td>
+                <td>@parent.ParentValue</td>
+                <td>@string.Join(", ", parent.Children.Select(child => child.ChildValue))</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+<button class="btn btn-light"
+        @onclick="@OnExportSelected"
+        type="button">
+    Export Database
+</button>
+
+<button class="btn btn-light"
+        @onclick="@OnDeleteDatabaseSelected"
+        type="button">
+    Delete Database
+</button>

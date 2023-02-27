@@ -1,0 +1,32 @@
+name: Deploy to GitHub Pages
+on:
+  push:
+    branches: [ main ]
+jobs:
+  deploy-to-github-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.*'
+
+      - name: Publish .NET Project
+        run: |
+          dotnet workload install wasm-tools
+          dotnet publish BlazorWasmEfCoreNormalized.csproj -c Release -o release --nologo
+
+      - name: Change base-tag in index.html from / to BlazorWasmEfCoreNormalized
+        run: sed -i 's/<base href="\/" \/>/<base href="\/BlazorWasmEfCoreNormalized\/" \/>/g' release/wwwroot/index.html
+
+      - name: Add .nojekyll file
+        run: touch release/wwwroot/.nojekyll
+
+      - name: Commit wwwroot to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: release/wwwroot
